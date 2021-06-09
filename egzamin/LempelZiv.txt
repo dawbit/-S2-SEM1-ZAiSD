@@ -1,0 +1,61 @@
+Rys historyczny lempel ziv (algorytmów słownikowych) geneza - to do przepisania
+
+lz77 opis + schemat poglądowy + pseudokod + przykład (opis przepisać, pseudokod z neta przerobić, schemat poglądywy na jego danych) + przykłady rozpisać z tego co mam w zeszycie.
+lz78 opis + schemat poglądowy + pseudokod + przykład
+lzw opis + schemat poglądowy + pseudokod + przykład
+
+analiza złożoności czasowej algorytmów - do przepisania
+literatura - do przepisania
+
+W roku 1977 Abraham Lempel i Jacob Ziv opublikowali przełomowy algorytm kompresji bezstratnej, który swoją nazwę zawdzięcza pierwszym literom nazwiska twórców i dacie jego opracowania - czyli LZ77. Był to algorytm przełomowy, ponieważ jako pierwszy algorytm wykorzystywał słownik do kompresji danych. LZ77 używa słownika dynamicznego - nazywanego również często oknem przesuwnym. Rok później, w 1978, ta sama para naukowców opublikowała kolejny algorytm - LZ78. Algorytm ten również używa słownika, jednak w przeciwieństwie do LZ77, algorytm ten analizuje dane wejsciowe i generuje statyczny słownik zamiast generować go dynamicznie.
+
+Zarówno algorytmy LZ77, jak i LZ78 szybko zyskały na popularności - powstały ich modyfikacje jak np.: LZW. //
+Ciekawostką jest, że większość powszechnie stosowanych algorytmów wywodzi się z algorytmu LZ77. Nie wynika to z przewagi technicznej tego algorytmu, ale z tego że algorytmy LZ78 zostały obciążone patentami po tym, jak pochodny algorytm LZW został opatentowany w 1984 roku i autor patentu zaczął pozywać dostawców oprogramowania, administratorów serwerów, a nawet użytkowników końcowych za używanie formatu GIF bez licencji.
+
+
+W kodowaniu LZ77 przechowuje się bufor (tzw. okno) będące połączeniem bufora słownikowego który zawiera określoną liczbę ostatnio kodowanych symboli i bufora kodowania z pewną liczbą symboli, które dopiero mają zostać w kolejnym kroku poddane kodowaniu. Rozpoczynając proces kodowania wypełniamy bufor słownikowy powtórzeniami pierwszego symbolu zawartości ciągu kodowanego, a bufor kodowania przedrostkiem kodowanego komunikatu, o długości równej długości bufora kodowania. Następnie cyklicznie wyszukujemy najdłuższy przedrostek $$f$$ bufora  kodowania  w  oknie.  Poszukiwania rozpoczynamy od końca bufora słownikowego po lewej stronie i przesuwamy się w prawo. Znalezione w ten sposób  dopasowanie $$f$$ może mieć długość większą od długości bufora słownikowego, nie większą jednak od długości okna. Po znalezieniu f wyprowadzamy trójkę $$<g_f, l_f, s>$$, gdzie $$g_f$$ oznacza pozycję $$f$$ w buforze słownikowym, $$l_f$$ to długość $$f$$, a $$s$$ to symbol, dla którego $$f$$ jest przedrostkiem  w  oknie, czyli pierwszy symbol znajdujący się w buforze kodowania za $$f$$. Po  wyprowadzeniu  trójki  $$<g_f, l_f, s>$$  zawartość  okna  przesuwamy  o  $$l_f$$  pozycji  w  lewo,  wprowadzając  jednocześnie  do  bufora  kodowania  kolejne,  nie  pobrane  jeszcze  symbole  komunikatu.
+
+
+WHILE wejście nie jest puste DO
+    prefiks := najdłuższy prefiks wejścia rozpoczynającego się w oknie
+    
+    IF prefiks nie jest pusty
+        d := odległość do początku prefiksu
+        l := długość prefiksu
+        c := znak następujący po prefiksie na wejściu
+    ELSE
+        d := 0
+        l := 0
+        c := pierwszy znak wejścia
+    END IF
+    
+    wyprowadź na wyjście <d, l, c>
+    
+    odrzuć l + 1 znak z przodu okna buforu
+    s := usuń l + 1 znak od początku wejścia
+    dołącz s z tyłu okna buforu
+REPEAT
+
+
+
+
+W algorytmie LZ78 pobiera się następne symbole kodowanego ciągu budując z nich pewną frazę. Po pobraniu kolejnego symbolu i dodaniu  go  na końcu już zbudowane  frazy sprawdza się, czy słownik tę frazę zawiera. Jeżeli frazy nie ma w słowniku, to wyprowadzany jest indeks najdłuższej dopasowanej frazy i  ostatnio  pobrany  symbol.  Po  zakodowaniu frazy i symbolu wstawia się do słownika frazę, dla której  operacja szukania zakończyła się niepowodzeniem i rozpoczyna się budowanie nowej frazy od frazy pustej. 
+
+
+
+opróżnij słownik 
+f := fraza pusta  
+WHILE nie pobrano wszystkich symboli komunikatu DO     
+	pobierz symbol s    
+	IF (f|s znajduje się w słowniku) 
+		f := f|s    
+	ELSE         
+		wyprowadź parę <indeks frazy f, s>         
+		wstaw frazę f|s do słownika         
+		f := fraza pusta     
+	END IF 
+END WHILE 
+wyprowadź parę <indeks frazy f, s> 
+
+
+Algorytm LZW jest udoskonaleniem algorytmu LZ78polegającym na wstępnym wypełnieniu słownika jednoznakowymi frazami ze wszystkimi symbolami występującymi w alfabecie. Wyprowadzane są tylko indeksy fraz. Współczynniki kompresji LZW są lepsze niż w przypadku używania algorytmu LZ78.
